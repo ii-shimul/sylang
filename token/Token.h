@@ -1,23 +1,32 @@
 #pragma once
 #include <string>
 
+// All token kinds produced by the Lexer.
 enum class TokenKind {
-    NUMBER, IDENT,
-    PLUS, MINUS, STAR, SLASH, EQUALS,
-    LPAREN, RPAREN,
-    IF, ELSE, WHILE, PRINT,
-    NEWLINE, EOF_TOKEN
+    NUMBER,
+    IDENT,
+    PRINT,
+    NEWLINE,
+    PLUS,
+    MINUS,
+    STAR,
+    SLASH,
+    EQUALS,
+    LPAREN,
+    RPAREN,
+    EOF_TOKEN,
+    UNKNOWN
 };
 
+// Human-readable name for a TokenKind (used by Token::toString())
 std::string tokenKindToString(TokenKind kind);
 
-class Token {
-public:
-    Token(TokenKind kind, std::string lexeme, int line);
-
+struct Token {
     TokenKind kind;
     std::string lexeme;
     int line;
-};
 
-std::string tokenToString(const Token& token);
+    Token(TokenKind kind, std::string lexeme, int line);
+
+    std::string toString() const;
+};
