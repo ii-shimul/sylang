@@ -10,9 +10,6 @@ enum class TokenKind {
     PLUS,
     MINUS,
     STAR,
-    IF, 
-    ELSE, 
-    WHILE,
     SLASH,
     EQUALS,
     LPAREN,
@@ -21,7 +18,6 @@ enum class TokenKind {
     UNKNOWN
 };
 
-// Human-readable name for a TokenKind (used by Token::toString())
 std::string tokenKindToString(TokenKind kind);
 
 struct Token {
