@@ -1,6 +1,5 @@
 #include "Token.h"
 #include <sstream>
-#include <utility>
 
 std:: string tokenKindToString(TokenKind kind){
     switch(kind){
@@ -24,11 +23,11 @@ std:: string tokenKindToString(TokenKind kind){
 }
 
 Token::Token(TokenKind kind, std::string lexeme, int line):
-    kind(kind), lexeme(std::move(lexeme)), line(line) {}
+    kind(kind), lexeme(lexeme), line(line) {}
 
-std::string tokenToString(const Token& token){
+std::string Token::toString() const {
     std::ostringstream out;
-    out<< "Token(" <<tokenKindToString(token.kind)
-        <<", \""<< token.lexeme << "\", line=" << token.line << ")";
+    out << "Token(" << tokenKindToString(kind)
+        << ", \"" << lexeme << "\", line=" << line << ")";
     return out.str();
 }
