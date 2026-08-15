@@ -14,4 +14,6 @@ add_executable(sylang
     parser/Parser.h
     semantic/SymbolTable.cpp
     semantic/SymbolTable.h
+    semantic/SemanticAnalyser.cpp
+    semantic/SemanticAnalyser.h
 )
