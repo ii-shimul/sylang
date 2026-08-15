@@ -67,7 +67,7 @@ private:
     StmtPtr parseAssignment();
     StmtPtr parsePrint();
 
-    
+
     // ---- expressions (precedence climbing) ----
     ExprPtr parseExpr();
     ExprPtr parseTerm();
@@ -75,3 +75,6 @@ private:
 
 
 };
+
+// ==================== Debug helper ====================
+void printAST(const std::vector& program, int indent = 0);

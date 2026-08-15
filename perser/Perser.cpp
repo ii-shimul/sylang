@@ -96,3 +96,44 @@ ExprPtr Parser::parseFactor() {
     advance(); // Skip bad token for now
     return std::make_unique("0");
 }
+
+namespace {
+void printIndent(int indent) { for (int i = 0; i < indent; i++) std::cout << "  "; }
+
+void printExpr(const Expr* expr, int indent) {
+    if (!expr) return;
+    if (const auto* n = dynamic_cast(expr)) {
+        printIndent(indent); std::cout << "Number(" << n->value << ")\n";
+    } else if (const auto* v = dynamic_cast(expr)) {
+        printIndent(indent); std::cout << "Variable(" << v->name << ")\n";
+    } else if (const auto* b = dynamic_cast(expr)) {
+        printIndent(indent); std::cout << "Binary(" << b->op << ")\n";
+        printExpr(b->left.get(), indent + 1);
+        printExpr(b->right.get(), indent + 1);
+    }
+}
+
+void printStmts(const std::vector& stmts, int indent);
+
+void printStmt(const Stmt* stmt, int indent) {
+    if (!stmt) return;
+    if (const auto* a = dynamic_cast(stmt)) {
+        printIndent(indent); std::cout << "Assign(" << a->name << ")\n";
+        printExpr(a->value.get(), indent + 1);
+    } else if (const auto* p = dynamic_cast(stmt)) {
+        printIndent(indent); std::cout << "Print\n";
+        printExpr(p->value.get(), indent + 1);
+    } else if (const auto* e = dynamic_cast(stmt)) {
+        printIndent(indent); std::cout << "ExprStmt\n";
+        printExpr(e->expr.get(), indent + 1);
+    }
+}
+
+void printStmts(const std::vector& stmts, int indent) {
+    for (const auto& s : stmts) printStmt(s.get(), indent);
+}
+} // namespace
+
+void printAST(const std::vector& program, int indent) {
+    printStmts(program, indent);
+}
