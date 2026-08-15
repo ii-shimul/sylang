@@ -52,3 +52,75 @@ public:
         this->right = right;
     }
 };
+// ================================================================
+// Phase 3: AST Statement & Control Flow Nodes
+// ================================================================
+
+// AssignNode: variable name and right-side expression
+class AssignNode : public ASTNode {
+public:
+    string variable;
+    shared_ptr<ASTNode> expression;
+
+    AssignNode(
+        string variable,
+        shared_ptr<ASTNode> expression
+    ) {
+        this->variable = variable;
+        this->expression = expression;
+    }
+};
+
+// PrintNode: expression to be printed
+class PrintNode : public ASTNode {
+public:
+    shared_ptr<ASTNode> expression;
+
+    PrintNode(shared_ptr<ASTNode> expression) {
+        this->expression = expression;
+    }
+};
+
+// IfNode: condition, then statements, else statements
+class IfNode : public ASTNode {
+public:
+    shared_ptr<ASTNode> condition;
+    vector<shared_ptr<ASTNode>> thenStatements;
+    vector<shared_ptr<ASTNode>> elseStatements;
+
+    IfNode(
+        shared_ptr<ASTNode> condition,
+        vector<shared_ptr<ASTNode>> thenStatements,
+        vector<shared_ptr<ASTNode>> elseStatements
+    ) {
+        this->condition = condition;
+        this->thenStatements = thenStatements;
+        this->elseStatements = elseStatements;
+    }
+};
+
+// WhileNode: condition and loop body statements
+class WhileNode : public ASTNode {
+public:
+    shared_ptr<ASTNode> condition;
+    vector<shared_ptr<ASTNode>> body;
+
+    WhileNode(
+        shared_ptr<ASTNode> condition,
+        vector<shared_ptr<ASTNode>> body
+    ) {
+        this->condition = condition;
+        this->body = body;
+    }
+};
+
+
+// ================================================================
+// Main Function
+// ================================================================
+
+int main() {
+    cout << "AST Phase 2 and Phase 3 completed successfully." << endl;
+
+    return 0;
+}
