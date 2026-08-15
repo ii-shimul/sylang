@@ -25,7 +25,7 @@ private:
 
     //Character-stream-access
     std::string currentChar() const;
-    std::string peak() const;
+    std::string peek() const;
     std::string advance();
 
     // ASCII + Bangla
