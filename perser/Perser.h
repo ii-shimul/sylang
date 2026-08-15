@@ -45,6 +45,22 @@ struct ExprStmt : Stmt {
     explicit ExprStmt(ExprPtr expr) : expr(std::move(expr)) {}
 };
 
+struct IfStmt : Stmt {
+    ExprPtr condition;
+    std::vector thenBranch;
+    std::vector elseBranch;
+    IfStmt(ExprPtr condition, std::vector thenBranch, std::vector elseBranch)
+        : condition(std::move(condition)), thenBranch(std::move(thenBranch)), elseBranch(std::move(elseBranch)) {}
+};
+
+struct WhileStmt : Stmt {
+    ExprPtr condition;
+    std::vector body;
+    WhileStmt(ExprPtr condition, std::vector body)
+        : condition(std::move(condition)), body(std::move(body)) {}
+};
+
+
 class Parser {
 public:
     explicit Parser(std::vector tokens);
@@ -66,6 +82,10 @@ private:
     StmtPtr parseStatement();
     StmtPtr parseAssignment();
     StmtPtr parsePrint();
+
+    StmtPtr parseIf();
+    StmtPtr parseWhile();
+    std::vector parseBlock();
 
 
     // ---- expressions (precedence climbing) ----

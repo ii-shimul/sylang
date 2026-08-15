@@ -46,6 +46,8 @@ std::vector Parser::parseProgram() {
 
 StmtPtr Parser::parseStatement() {
     if (check(TokenKind::PRINT)) return parsePrint();
+    if (check(TokenKind::IF)) return parseIf();
+    if (check(TokenKind::WHILE)) return parseWhile();
     if (check(TokenKind::IDENT) && peekAt(1).kind == TokenKind::EQUALS) return parseAssignment();
     
     ExprPtr expr = parseExpr();
@@ -73,6 +75,45 @@ ExprPtr Parser::parseExpr() {
         left = std::make_unique(op, std::move(left), std::move(right));
     }
     return left;
+}
+
+StmtPtr Parser::parseIf() {
+    advance(); // consume IF
+    ExprPtr condition = parseExpr();
+    std::vector thenBranch = parseBlock();
+
+    std::vector elseBranch;
+    skipNewlines();
+    if (check(TokenKind::ELSE)) {
+        advance();
+        elseBranch = parseBlock();
+    }
+    return std::make_unique(std::move(condition), std::move(thenBranch), std::move(elseBranch));
+}
+
+StmtPtr Parser::parseWhile() {
+    advance(); // consume WHILE
+    ExprPtr condition = parseExpr();
+    std::vector body = parseBlock();
+    return std::make_unique(std::move(condition), std::move(body));
+}
+
+std::vector Parser::parseBlock() {
+    std::vector statements;
+    skipNewlines();
+    if (match(TokenKind::LBRACE)) {
+        skipNewlines();
+        while (!check(TokenKind::RBRACE) && !isAtEnd()) {
+            StmtPtr stmt = parseStatement();
+            if (stmt) statements.push_back(std::move(stmt));
+            skipNewlines();
+        }
+        if (check(TokenKind::RBRACE)) advance();
+        return statements;
+    }
+    StmtPtr stmt = parseStatement();
+    if (stmt) statements.push_back(std::move(stmt));
+    return statements;
 }
 
 ExprPtr Parser::parseTerm() {
