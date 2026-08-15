@@ -1,0 +1,106 @@
+<program> ::= <statement-list>
+
+
+<statement-list> ::= <statement>
+                    | <statement> <statement-list>
+
+
+<statement> ::= <declaration>
+              | <assignment>
+              | <print-statement>
+              | <if-statement>
+              | <while-statement>
+
+
+<declaration> ::= <type> <identifier> ";"
+                | <type> <identifier> "=" <expression> ";"
+
+
+<type> ::= "pura"
+          | "bhanga"
+
+
+<assignment> ::= <identifier> "=" <expression> ";"
+
+
+<print-statement> ::= "dekhaw" "(" <expression> ")" ";"
+
+
+<if-statement> ::= "zudi" "(" <condition> ")" "{"
+                       <statement-list>
+                   "}"
+                 | "zudi" "(" <condition> ")" "{"
+                       <statement-list>
+                   "}" "naile" "{"
+                       <statement-list>
+                   "}"
+
+
+<while-statement> ::= "zotokhon" "(" <condition> ")" "{"
+                          <statement-list>
+                      "}"
+
+
+<condition> ::= <expression> <comparison-op> <expression>
+
+
+<comparison-op> ::= "=="
+                  | "!="
+                  | "<"
+                  | ">"
+                  | "<="
+                  | ">="
+
+
+<expression> ::= <term>
+               | <expression> "+" <term>
+               | <expression> "-" <term>
+
+
+<term> ::= <factor>
+         | <term> "*" <factor>
+         | <term> "/" <factor>
+
+
+<factor> ::= <number>
+           | <identifier>
+           | "(" <expression> ")"
+
+
+<number> ::= <integer>
+           | <decimal>
+
+
+<integer> ::= <digit>
+            | <digit> <integer>
+
+
+<decimal> ::= <integer> "." <integer>
+
+
+<identifier> ::= <letter>
+               | <identifier> <letter>
+               | <identifier> <digit>
+               | <identifier> "_"
+
+
+<letter> ::= "a" | "b" | "c" | "d" | "e" | "f" | "g"
+           | "h" | "i" | "j" | "k" | "l" | "m" | "n"
+           | "o" | "p" | "q" | "r" | "s" | "t" | "u"
+           | "v" | "w" | "x" | "y" | "z"
+           | "A" | "B" | "C" | "D" | "E" | "F" | "G"
+           | "H" | "I" | "J" | "K" | "L" | "M" | "N"
+           | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+           | "V" | "W" | "X" | "Y" | "Z"
+
+
+<digit> ::= "0"
+          | "1"
+          | "2"
+          | "3"
+          | "4"
+          | "5"
+          | "6"
+          | "7"
+          | "8"
+          | "9"
