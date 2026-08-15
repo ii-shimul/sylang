@@ -27,6 +27,43 @@ void SemanticAnalyser::checkStatement(Stmt* stmt) {
             }
         }
     }
+
+    else if (AssignStmt* a = dynamic_cast<AssignStmt*>(stmt)) {
+        if (!table.isDefined(a->name)) {
+            errors.push_back("Error: Variable '" + a->name + "' is assigned before definition.");
+        } else {
+            string varType = table.lookup(a->name);
+            string exprType = checkExpression(a->value);
+            if (exprType != "" && exprType != varType) {
+                errors.push_back("Error: Type mismatch. Cannot assign type '" + exprType + "' to variable '" + a->name + "' of type '" + varType + "'.");
+            }
+        }
+    }
+
+    else if (PrintStmt* p = dynamic_cast<PrintStmt*>(stmt)) {
+        checkExpression(p->value);
+    }
+
+    else if (IfStmt* i = dynamic_cast<IfStmt*>(stmt)) {
+        checkExpression(i->condition);
+        for (size_t k = 0; k < i->thenBranch.size(); k++) {
+            checkStatement(i->thenBranch[k]);
+        }
+        for (size_t k = 0; k < i->elseBranch.size(); k++) {
+            checkStatement(i->elseBranch[k]);
+        }
+    }
+
+    else if (WhileStmt* w = dynamic_cast<WhileStmt*>(stmt)) {
+        checkExpression(w->condition);
+        for (size_t k = 0; k < w->body.size(); k++) {
+            checkStatement(w->body[k]);
+        }
+    }
+
+    else if (ExprStmt* e = dynamic_cast<ExprStmt*>(stmt)) {
+        checkExpression(e->expr);
+    }
 }
 
 string SemanticAnalyser::checkExpression(Expr* expr) {
@@ -45,6 +82,16 @@ string SemanticAnalyser::checkExpression(Expr* expr) {
             return "পুরা"; // default fallback type
         }
         return table.lookup(v->name);
+    }
+
+    if (BinaryExpr* b = dynamic_cast<BinaryExpr*>(expr)) {
+        string leftType = checkExpression(b->left);
+        string rightType = checkExpression(b->right);
+        if (leftType != "" && rightType != "" && leftType != rightType) {
+            errors.push_back("Error: Type mismatch in operation '" + b->op + "'. Cannot operate on '" + leftType + "' and '" + rightType + "'.");
+            return "পুরা"; // default fallback
+        }
+        return leftType;
     }
 
     return "";

@@ -1,5 +1,6 @@
 #include "lexer/Lexer.h"
 #include "parser/Parser.h"
+#include "semantic/SemanticAnalyser.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -41,6 +42,11 @@ int main() {
     } else {
         cout << "Parsing successful! Abstract Syntax Tree (AST):" << endl;
         printAST(program);
+
+        cout << "\nRunning semantic analysis..." << endl;
+        SemanticAnalyser analyser;
+        analyser.checkProgram(program);
+        analyser.report();
     }
 
     return 0;
