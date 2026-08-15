@@ -1,4 +1,5 @@
 #include "lexer/Lexer.h"
+#include "parser/Parser.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -26,9 +27,20 @@ int main() {
     Lexer lexer(source);
     vector<Token> tokens = lexer.tokenize();
 
-    cout << "Tokens scanned:" << endl;
+    cout << "\nTokens scanned:" << endl;
     for (size_t i = 0; i < tokens.size(); i++) {
         cout << "  " << tokens[i].toString() << endl;
+    }
+
+    cout << "\nParsing program..." << endl;
+    Parser parser(tokens);
+    vector<Stmt*> program = parser.parseProgram();
+
+    if (parser.hasError()) {
+        cout << "Parsing failed due to errors." << endl;
+    } else {
+        cout << "Parsing successful! Abstract Syntax Tree (AST):" << endl;
+        printAST(program);
     }
 
     return 0;

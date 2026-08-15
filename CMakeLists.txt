@@ -10,4 +10,6 @@ add_executable(sylang
     lexer/Lexer.h
     token/Token.cpp
     token/Token.h
+    parser/Parser.cpp
+    parser/Parser.h
 )
