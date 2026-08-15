@@ -26,9 +26,30 @@ struct BinaryExpr : Expr {
         : op(std::move(op)), left(std::move(left)), right(std::move(right)) {}
 };
 
+struct Stmt { virtual ~Stmt() = default; };
+using StmtPtr = std::unique_ptr;
+
+struct AssignStmt : Stmt {
+    std::string name;
+    ExprPtr value;
+    AssignStmt(std::string name, ExprPtr value) : name(std::move(name)), value(std::move(value)) {}
+};
+
+struct PrintStmt : Stmt {
+    ExprPtr value;
+    explicit PrintStmt(ExprPtr value) : value(std::move(value)) {}
+};
+
+struct ExprStmt : Stmt {
+    ExprPtr expr;
+    explicit ExprStmt(ExprPtr expr) : expr(std::move(expr)) {}
+};
+
 class Parser {
 public:
     explicit Parser(std::vector tokens);
+
+    std::vector parseProgram();
 private:
     std::vector tokens;
     size_t pos;
@@ -40,9 +61,17 @@ private:
     bool check(TokenKind kind) const;
     bool match(TokenKind kind);
     void skipNewlines();
+    
+    
+    StmtPtr parseStatement();
+    StmtPtr parseAssignment();
+    StmtPtr parsePrint();
 
+    
     // ---- expressions (precedence climbing) ----
     ExprPtr parseExpr();
     ExprPtr parseTerm();
     ExprPtr parseFactor();
+
+
 };

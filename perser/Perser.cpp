@@ -33,6 +33,37 @@ void Parser::skipNewlines() {
     while (check(TokenKind::NEWLINE)) advance();
 }
 
+std::vector Parser::parseProgram() {
+    std::vector statements;
+    skipNewlines();
+    while (!isAtEnd()) {
+        StmtPtr stmt = parseStatement();
+        if (stmt) statements.push_back(std::move(stmt));
+        skipNewlines();
+    }
+    return statements;
+}
+
+StmtPtr Parser::parseStatement() {
+    if (check(TokenKind::PRINT)) return parsePrint();
+    if (check(TokenKind::IDENT) && peekAt(1).kind == TokenKind::EQUALS) return parseAssignment();
+    
+    ExprPtr expr = parseExpr();
+    return std::make_unique(std::move(expr));
+}
+
+StmtPtr Parser::parseAssignment() {
+    std::string name = advance().lexeme;
+    advance(); // Consume '='
+    ExprPtr value = parseExpr();
+    return std::make_unique(name, std::move(value));
+}
+
+StmtPtr Parser::parsePrint() {
+    advance(); // Consume PRINT
+    ExprPtr value = parseExpr();
+    return std::make_unique(std::move(value));
+}
 
 ExprPtr Parser::parseExpr() {
     ExprPtr left = parseTerm();
