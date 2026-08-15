@@ -32,3 +32,36 @@ bool Parser::match(TokenKind kind) {
 void Parser::skipNewlines() {
     while (check(TokenKind::NEWLINE)) advance();
 }
+
+
+ExprPtr Parser::parseExpr() {
+    ExprPtr left = parseTerm();
+    while (check(TokenKind::PLUS) || check(TokenKind::MINUS)) {
+        std::string op = advance().lexeme;
+        ExprPtr right = parseTerm();
+        left = std::make_unique(op, std::move(left), std::move(right));
+    }
+    return left;
+}
+
+ExprPtr Parser::parseTerm() {
+    ExprPtr left = parseFactor();
+    while (check(TokenKind::STAR) || check(TokenKind::SLASH)) {
+        std::string op = advance().lexeme;
+        ExprPtr right = parseFactor();
+        left = std::make_unique(op, std::move(left), std::move(right));
+    }
+    return left;
+}
+
+ExprPtr Parser::parseFactor() {
+    if (check(TokenKind::NUMBER)) return std::make_unique(advance().lexeme);
+    if (check(TokenKind::IDENT)) return std::make_unique(advance().lexeme);
+    if (match(TokenKind::LPAREN)) {
+        ExprPtr expr = parseExpr();
+        if (check(TokenKind::RPAREN)) advance(); // Basic expect for now
+        return expr;
+    }
+    advance(); // Skip bad token for now
+    return std::make_unique("0");
+}

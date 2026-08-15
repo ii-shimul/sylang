@@ -40,4 +40,9 @@ private:
     bool check(TokenKind kind) const;
     bool match(TokenKind kind);
     void skipNewlines();
+
+    // ---- expressions (precedence climbing) ----
+    ExprPtr parseExpr();
+    ExprPtr parseTerm();
+    ExprPtr parseFactor();
 };
