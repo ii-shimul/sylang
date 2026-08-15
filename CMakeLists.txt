@@ -12,4 +12,6 @@ add_executable(sylang
     token/Token.h
     parser/Parser.cpp
     parser/Parser.h
+    semantic/SymbolTable.cpp
+    semantic/SymbolTable.h
 )
