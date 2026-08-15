@@ -1,0 +1,10 @@
+পুরা ক = ১০;
+পুরা ক = ২০; // duplicate definition
+
+খ = ৩০; // assign before definition
+
+পুরা গ = ২০.৫; // type mismatch in initialization
+
+পুরা ঘ = ১০;
+ভাঙ্গা ঙ = ২০.৫;
+ঘ = ঘ + ঙ; // type mismatch in operation

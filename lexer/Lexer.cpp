@@ -1,177 +1,226 @@
-#include "./Lexer.h"
-#include<cctype>
-#include<iostream>
+#include "Lexer.h"
+#include <iostream>
 
-Lexer::Lexer(std::string source) : source(std::move(source)), pos(0), line(1){}
+Lexer::Lexer(std::string source) : source(source), pos(0), line(1), sourceLength(source.length()) {}
 
-
-//UTF-8 helper functions
-
-//Number of bytes in the UTF-8 char
-int Lexer::utf8CharLen(unsigned char leadByte){
-    if((leadByte & 0x80) == 0x00) return 1; //ASCII
-    if((leadByte & 0xE0) == 0xC0) return 2; 
-    if((leadByte & 0xF0) == 0xE0) return 3;// Bangla
-    if((leadByte & 0xF8) == 0xF0) return 4;
-    return 1;
-}
-
-unsigned long Lexer::decodeUtf8CodePoint(const std::string& s, size_t bytePos, int len){
-    unsigned char first = static_cast<unsigned char>(s[bytePos]);
-    unsigned long cp = 0;
-
-    switch(len){
-        case 1: cp = first;         break;
-        case 2: cp = first & 0x1F;  break;
-        case 3: cp = first & 0x0F;  break;
-        case 4: cp = first & 0x07;  break;
-        default: cp = first;        break;
-    };
-
-    for (int i = 1; i < len && bytePos + i <s.size(); i++){
-        unsigned char count = static_cast<unsigned char>(s[bytePos + i]);
-        cp = (cp << 6) | (count & 0x3F);
+char Lexer::currentChar() const {
+    if (pos < sourceLength) {
+        return source[pos];
     }
-
-    return cp;
+    return '\0';
 }
 
-//Bangla digits occupy U+09E6 - U=09EF.
-bool Lexer::isBanglaDigitCP(unsigned long codePoint){
-    return codePoint >= 0x09E6 && codePoint <= 0x09EF;
+char Lexer::peek() const {
+    if (pos + 1 < sourceLength) {
+        return source[pos + 1];
+    }
+    return '\0';
 }
 
-//Bangla block is U+0980 - U+09FF
-bool Lexer::isBanglaLetterCP(unsigned long codePoint){
-    return codePoint >= 0x0980 && codePoint <= 0x09FF && !isBanglaDigitCP(codePoint);
-}
-
-
-// Character-stream access
-std::string Lexer::currentChar() const{
-    if (pos >= source.size()) return "";
-
-    int len = utf8CharLen(static_cast<unsigned char>(source[pos]));
-    if(pos + static_cast<size_t>(len) > source.size()) len = 1;
-    return source.substr(pos, len);
-}
-
-std::string Lexer::peek() const {
-    if (pos >= source.size()) return "";
-
-    int len = utf8CharLen(static_cast<unsigned char>(source[pos]));
-    if(pos + static_cast<size_t>(len) > source.size()) len = 1;
-
-    size_t nextPos = pos + len;
-    if(nextPos >= source.size()) return "";
-
-    int nextLen =  utf8CharLen(static_cast<unsigned char>(source[nextPos]));
-
-    if(nextPos + static_cast<size_t>(nextLen) > source.size()) nextLen = 1;
-
-    return source.substr(nextPos, nextLen);
-}
-
-
-std::string Lexer::advance() {
-    std:: string ch = currentChar();
-    pos += ch.size();
-    if(ch == "\n"){
-        line++;
+char Lexer::advance() {
+    char ch = currentChar();
+    if (ch != '\0') {
+        pos++;
+        if (ch == '\n') {
+            line++;
+        }
     }
     return ch;
 }
 
-
-// Classification
-bool Lexer::isDigitChar(const std::string& ch) const {
-    if (ch.empty()) return false;
-    return isBanglaDigitCP(decodeUtf8CodePoint(ch, 0, static_cast<int> (ch.size())));
-}
-
-bool Lexer::isAlphaChar(const std::string& ch) const{
-    if(ch.empty()) return false;
-    return isBanglaLetterCP(decodeUtf8CodePoint(ch, 0, static_cast<int>(ch.size())));
-}
-
-bool Lexer::isAlnumChar(const std::string& ch) const {
-    return isAlphaChar(ch) || isDigitChar(ch);
-}
-
-
-Token Lexer::readNumber() {
-    int startLine = line;
-    std::string numberStr;
-    while (isDigitChar(currentChar())) {
-        numberStr += advance();
-    }
-    return Token(TokenKind::NUMBER, numberStr, startLine);
-}
-
-Token Lexer::readIdentOrKeyword() {
-    int startLine = line;
-    std::string word;
-    while (isAlnumChar(currentChar()) || currentChar() == "_") {
-        word += advance();
-    }
-
-    // Support only Bangla PRINT keyword ("দেখাও").
-    if (word == "\u09A6\u09C7\u0996\u09BE\u0993") {
-        return Token(TokenKind::PRINT, word, startLine);
-    }
-    return Token(TokenKind::IDENT, word, startLine);
-}
-
-
-std::vector<Token> Lexer::tokenize() {
-    while (pos < source.size()) {
-        std::string ch = currentChar();
-
-        if (ch == " " || ch == "\t") {
+void Lexer::skipWhitespaceAndComments() {
+    while (pos < sourceLength) {
+        char ch = currentChar();
+        if (ch == ' ' || ch == '\t' || ch == '\r') {
             advance();
-        } else if (ch == "/" && peek() == "/") {
-            while (currentChar() != "\n" && currentChar() != "") {
+        } else if (ch == '/' && peek() == '/') {
+            // Skip single-line comments: // ... until \n or EOF
+            while (currentChar() != '\0' && currentChar() != '\n') {
                 advance();
             }
-        } else if (ch == "\n") {
-            tokens.emplace_back(TokenKind::NEWLINE, "\\n", line);
-            advance();
-        } else if (ch == "+") {
-            tokens.emplace_back(TokenKind::PLUS, "+", line);
-            advance();
-        } else if (ch == "-") {
-            tokens.emplace_back(TokenKind::MINUS, "-", line);
-            advance();
-        } else if (ch == "*") {
-            tokens.emplace_back(TokenKind::STAR, "*", line);
-            advance();
-        } else if (ch == "/") {
-            tokens.emplace_back(TokenKind::SLASH, "/", line);
-            advance();
-        } else if (ch == "=") {
-            tokens.emplace_back(TokenKind::EQUALS, "=", line);
-            advance();
-        } else if (ch == "(") {
-            tokens.emplace_back(TokenKind::LPAREN, "(", line);
-            advance();
-        } else if (ch == ")") {
-            tokens.emplace_back(TokenKind::RPAREN, ")", line);
-            advance();
-        } else if (isDigitChar(ch)) {
-            tokens.push_back(readNumber());
-        } else if (isAlphaChar(ch) || ch == "_") {
-            tokens.push_back(readIdentOrKeyword());
         } else {
-            std::cerr << "[Lexer Error] Unknown character '" << ch
-                      << "' on line " << line << std::endl;
+            break;
+        }
+    }
+}
+
+static bool isDigit(char c) {
+    return c >= '0' && c <= '9';
+}
+
+static bool isBengaliDigitAt(const std::string& source, int pos) {
+    if (pos + 2 < (int)source.length()) {
+        unsigned char b1 = source[pos];
+        unsigned char b2 = source[pos + 1];
+        unsigned char b3 = source[pos + 2];
+        return b1 == 0xE0 && b2 == 0xA7 && b3 >= 0xA6 && b3 <= 0xAF;
+    }
+    return false;
+}
+
+static bool isIdentStartAt(const std::string& source, int pos) {
+    if (pos >= (int)source.length()) return false;
+    char c = source[pos];
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_') {
+        return true;
+    }
+    if ((unsigned char)c >= 0x80) {
+        return !isBengaliDigitAt(source, pos);
+    }
+    return false;
+}
+
+static bool isIdentPartAt(const std::string& source, int pos) {
+    if (pos >= (int)source.length()) return false;
+    char c = source[pos];
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || isDigit(c)) {
+        return true;
+    }
+    if ((unsigned char)c >= 0x80) {
+        return !isBengaliDigitAt(source, pos);
+    }
+    return false;
+}
+
+std::vector<Token> Lexer::tokenize() {
+    std::vector<Token> tokens;
+
+    while (pos < sourceLength) {
+        skipWhitespaceAndComments();
+        if (pos >= sourceLength) break;
+
+        char ch = currentChar();
+
+        // Newline tokenization
+        if (ch == '\n') {
+            tokens.push_back(Token(TokenKind::NEWLINE, "\\n", line));
+            advance();
+            continue;
+        }
+
+        // Single and multi-character operators
+        if (ch == '+') {
+            tokens.push_back(Token(TokenKind::PLUS, "+", line));
+            advance();
+        } else if (ch == '-') {
+            tokens.push_back(Token(TokenKind::MINUS, "-", line));
+            advance();
+        } else if (ch == '*') {
+            tokens.push_back(Token(TokenKind::STAR, "*", line));
+            advance();
+        } else if (ch == '/') {
+            tokens.push_back(Token(TokenKind::SLASH, "/", line));
+            advance();
+        } else if (ch == ';') {
+            tokens.push_back(Token(TokenKind::SEMICOLON, ";", line));
+            advance();
+        } else if (ch == '(') {
+            tokens.push_back(Token(TokenKind::LPAREN, "(", line));
+            advance();
+        } else if (ch == ')') {
+            tokens.push_back(Token(TokenKind::RPAREN, ")", line));
+            advance();
+        } else if (ch == '{') {
+            tokens.push_back(Token(TokenKind::LBRACE, "{", line));
+            advance();
+        } else if (ch == '}') {
+            tokens.push_back(Token(TokenKind::RBRACE, "}", line));
+            advance();
+        } else if (ch == '=') {
+            if (peek() == '=') {
+                tokens.push_back(Token(TokenKind::EQEQ, "==", line));
+                advance(); // '='
+                advance(); // '='
+            } else {
+                tokens.push_back(Token(TokenKind::EQUALS, "=", line));
+                advance();
+            }
+        } else if (ch == '!') {
+            if (peek() == '=') {
+                tokens.push_back(Token(TokenKind::NE, "!=", line));
+                advance();
+                advance();
+            } else {
+                tokens.push_back(Token(TokenKind::UNKNOWN, "!", line));
+                std::cout << "[Lexer Error] Unknown character '!' on line " << line << std::endl;
+                advance();
+            }
+        } else if (ch == '<') {
+            if (peek() == '=') {
+                tokens.push_back(Token(TokenKind::LE, "<=", line));
+                advance();
+                advance();
+            } else {
+                tokens.push_back(Token(TokenKind::LT, "<", line));
+                advance();
+            }
+        } else if (ch == '>') {
+            if (peek() == '=') {
+                tokens.push_back(Token(TokenKind::GE, ">=", line));
+                advance();
+                advance();
+            } else {
+                tokens.push_back(Token(TokenKind::GT, ">", line));
+                advance();
+            }
+        }
+        // Numbers (Arabic or Bengali)
+        else if (isDigit(ch) || isBengaliDigitAt(source, pos)) {
+            std::string numLex;
+            while (isDigit(currentChar()) || isBengaliDigitAt(source, pos)) {
+                if (isDigit(currentChar())) {
+                    numLex += advance();
+                } else {
+                    numLex += advance(); // byte 1
+                    numLex += advance(); // byte 2
+                    numLex += advance(); // byte 3
+                }
+            }
+            if (currentChar() == '.' && (isDigit(peek()) || isBengaliDigitAt(source, pos + 1))) {
+                numLex += advance(); // '.'
+                while (isDigit(currentChar()) || isBengaliDigitAt(source, pos)) {
+                    if (isDigit(currentChar())) {
+                        numLex += advance();
+                    } else {
+                        numLex += advance(); // byte 1
+                        numLex += advance(); // byte 2
+                        numLex += advance(); // byte 3
+                    }
+                }
+            }
+            tokens.push_back(Token(TokenKind::NUMBER, numLex, line));
+        }
+        // Identifiers and Keywords (including UTF-8 Bengali characters)
+        else if (isIdentStartAt(source, pos)) {
+            std::string identLex;
+            while (isIdentPartAt(source, pos)) {
+                identLex += advance();
+            }
+
+            // Keyword mapping
+            if (identLex == "দেখাও" || identLex == "dekhaw") {
+                tokens.push_back(Token(TokenKind::PRINT, identLex, line));
+            } else if (identLex == "জুদি" || identLex == "zudi") {
+                tokens.push_back(Token(TokenKind::IF, identLex, line));
+            } else if (identLex == "নাইলে" || identLex == "naile") {
+                tokens.push_back(Token(TokenKind::ELSE, identLex, line));
+            } else if (identLex == "জতক্ষণ" || identLex == "zotokhon") {
+                tokens.push_back(Token(TokenKind::WHILE, identLex, line));
+            } else if (identLex == "পুরা" || identLex == "pura" || identLex == "ভাঙ্গা" || identLex == "bhanga") {
+                tokens.push_back(Token(TokenKind::TYPE, identLex, line));
+            } else {
+                tokens.push_back(Token(TokenKind::IDENT, identLex, line));
+            }
+        }
+        // Unknown characters
+        else {
+            std::string lex(1, ch);
+            tokens.push_back(Token(TokenKind::UNKNOWN, lex, line));
+            std::cout << "[Lexer Error] Unknown character '" << ch << "' on line " << line << std::endl;
             advance();
         }
     }
 
-    if (!tokens.empty() && tokens.back().kind != TokenKind::NEWLINE) {
-        tokens.emplace_back(TokenKind::NEWLINE, "\\n", line);
-    }
-
-    tokens.emplace_back(TokenKind::EOF_TOKEN, "", line);
+    tokens.push_back(Token(TokenKind::EOF_TOKEN, "", line));
     return tokens;
 }
