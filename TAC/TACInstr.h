@@ -48,5 +48,40 @@ struct TACPrint : public TACInstr {
     }
 };
 
+// TACLabel
+
+struct TACLabel : public TACInstr {
+    std::string label;
+
+    TACLabel(std::string label) {
+        this->label = label;
+    }
+};
+
+
+// TACJump
+
+struct TACJump : public TACInstr {
+    std::string target;
+
+    TACJump(std::string target) {
+        this->target = target;
+    }
+};
+
+
+// TACJumpIf
+
+struct TACJumpIf : public TACInstr {
+    std::string cond;
+    std::string target;
+
+    TACJumpIf(std::string cond, std::string target) {
+        this->cond = cond;
+        this->target = target;
+    }
+};
+
+#endif // TAC_INSTR_H
 
 
