@@ -26,3 +26,27 @@ struct TACBinOp : public TACInstr {
 };
 
 
+// TACCopy
+
+struct TACCopy : public TACInstr {
+    std::string dest;
+    std::string src;
+
+    TACCopy(std::string dest, std::string src) {
+        this->dest = dest;
+        this->src = src;
+    }
+};
+
+// TACPrint
+
+struct TACPrint : public TACInstr {
+    std::string operand;
+
+    TACPrint(std::string operand) {
+        this->operand = operand;
+    }
+};
+
+
+
