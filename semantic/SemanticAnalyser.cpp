@@ -3,6 +3,30 @@
 
 using namespace std;
 
+// Helper to convert Bengali/Arabic number string to double
+static double parseNumber(const string& val) {
+    string arabic = "";
+    for (size_t i = 0; i < val.length(); i++) {
+        if (i + 2 < val.length()) {
+            unsigned char b1 = val[i];
+            unsigned char b2 = val[i+1];
+            unsigned char b3 = val[i+2];
+            if (b1 == 0xE0 && b2 == 0xA7 && b3 >= 0xA6 && b3 <= 0xAF) {
+                int digit = b3 - 0xA6; // 0 to 9
+                arabic += to_string(digit);
+                i += 2;
+                continue;
+            }
+        }
+        arabic += val[i];
+    }
+    try {
+        return stod(arabic);
+    } catch (...) {
+        return 0.0;
+    }
+}
+
 SemanticAnalyser::SemanticAnalyser() {}
 
 void SemanticAnalyser::checkProgram(const vector<Stmt*>& program) {
@@ -87,6 +111,16 @@ string SemanticAnalyser::checkExpression(Expr* expr) {
     if (BinaryExpr* b = dynamic_cast<BinaryExpr*>(expr)) {
         string leftType = checkExpression(b->left);
         string rightType = checkExpression(b->right);
+
+        // Check for division by zero
+        if (b->op == "/") {
+            if (NumberExpr* rightNum = dynamic_cast<NumberExpr*>(b->right)) {
+                if (parseNumber(rightNum->value) == 0.0) {
+                    errors.push_back("Error: Division by zero is not allowed.");
+                }
+            }
+        }
+
         if (leftType != "" && rightType != "" && leftType != rightType) {
             errors.push_back("Error: Type mismatch in operation '" + b->op + "'. Cannot operate on '" + leftType + "' and '" + rightType + "'.");
             return "পুরা"; // default fallback
