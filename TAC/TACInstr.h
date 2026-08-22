@@ -7,6 +7,7 @@
 
 struct TACInstr {
     virtual ~TACInstr() {}
+    virtual std::string toString() const = 0;
 };
 
 // TACBinOp
@@ -23,6 +24,10 @@ struct TACBinOp : public TACInstr {
         this->op = op;
         this->right = right;
     }
+
+    std::string toString() const override {
+        return dest + " = " + left + " " + op + " " + right;
+    }
 };
 
 
@@ -36,6 +41,10 @@ struct TACCopy : public TACInstr {
         this->dest = dest;
         this->src = src;
     }
+
+    std::string toString() const override {
+        return dest + " = " + src;
+    }
 };
 
 // TACPrint
@@ -45,6 +54,10 @@ struct TACPrint : public TACInstr {
 
     TACPrint(std::string operand) {
         this->operand = operand;
+    }
+
+    std::string toString() const override {
+        return "print " + operand;
     }
 };
 
@@ -56,6 +69,10 @@ struct TACLabel : public TACInstr {
     TACLabel(std::string label) {
         this->label = label;
     }
+
+    std::string toString() const override {
+        return label + ":";
+    }
 };
 
 
@@ -66,6 +83,10 @@ struct TACJump : public TACInstr {
 
     TACJump(std::string target) {
         this->target = target;
+    }
+
+    std::string toString() const override {
+        return "goto " + target;
     }
 };
 
@@ -80,8 +101,10 @@ struct TACJumpIf : public TACInstr {
         this->cond = cond;
         this->target = target;
     }
+
+    std::string toString() const override {
+        return "ifFalse " + cond + " goto " + target;
+    }
 };
 
 #endif // TAC_INSTR_H
-
-
