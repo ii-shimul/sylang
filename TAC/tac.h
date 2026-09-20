@@ -1,4 +1,4 @@
-// tac.h
+/ tac.h
 #ifndef TAC_H
 #define TAC_H
 
@@ -54,7 +54,7 @@ struct TACLabel : public TACInstr {
     }
 };
 
-/ goto L1
+// goto L1
 struct TACJump : public TACInstr {
     string target;   // destination label
 
