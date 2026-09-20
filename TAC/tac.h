@@ -53,3 +53,25 @@ struct TACLabel : public TACInstr {
         name = n;
     }
 };
+
+/ goto L1
+struct TACJump : public TACInstr {
+    string target;   // destination label
+
+    TACJump(string t) {
+        target = t;
+    }
+};
+
+// ifFalse cond goto L1
+struct TACJumpIf : public TACInstr {
+    string condition;   // condition variable/temp
+    string target;      // destination label
+
+    TACJumpIf(string c, string t) {
+        condition = c;
+        target = t;
+    }
+};
+
+#endif
