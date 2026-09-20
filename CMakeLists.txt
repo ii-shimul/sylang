@@ -10,4 +10,12 @@ add_executable(sylang
     lexer/Lexer.h
     token/Token.cpp
     token/Token.h
+    parser/Parser.cpp
+    parser/Parser.h
+    semantic/SymbolTable.cpp
+    semantic/SymbolTable.h
+    semantic/SemanticAnalyser.cpp
+    semantic/SemanticAnalyser.h
+    TAC/TACGenerator.cpp
+    TAC/TACGenerator.h
 )

@@ -5,18 +5,31 @@
 enum class TokenKind {
     NUMBER,
     IDENT,
-    PRINT,
+    PRINT,      // দেখাও
     NEWLINE,
-    PLUS,
-    MINUS,
-    STAR,
-    IF, 
-    ELSE, 
-    WHILE,
-    SLASH,
-    EQUALS,
-    LPAREN,
-    RPAREN,
+    PLUS,       // +
+    MINUS,      // -
+    STAR,       // *
+    SLASH,      // /
+    EQUALS,     // =
+    LPAREN,     // (
+    RPAREN,     // )
+    LBRACE,     // {
+    RBRACE,     // }
+    SEMICOLON,  // ;
+    IF,         // জুদি
+    ELSE,       // নাইলে
+    WHILE,      // জতক্ষণ
+    TYPE,       // পুরা / ভাঙ্গা
+    
+    // Comparison operators
+    EQEQ,       // ==
+    NE,         // !=
+    LT,         // <
+    GT,         // >
+    LE,         // <=
+    GE,         // >=
+
     EOF_TOKEN,
     UNKNOWN
 };
