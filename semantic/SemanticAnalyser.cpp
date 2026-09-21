@@ -5,20 +5,23 @@ using namespace std;
 
 // Helper to convert Bengali/Arabic number string to double
 static double parseNumber(const string& val) {
+    static const string banglaDigits[10] = {"০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"};
     string arabic = "";
-    for (size_t i = 0; i < val.length(); i++) {
-        if (i + 2 < val.length()) {
-            unsigned char b1 = val[i];
-            unsigned char b2 = val[i+1];
-            unsigned char b3 = val[i+2];
-            if (b1 == 0xE0 && b2 == 0xA7 && b3 >= 0xA6 && b3 <= 0xAF) {
-                int digit = b3 - 0xA6; // 0 to 9
-                arabic += to_string(digit);
-                i += 2;
-                continue;
+    for (size_t i = 0; i < val.length(); ) {
+        bool matched = false;
+        for (int d = 0; d < 10; d++) {
+            const string& bd = banglaDigits[d];
+            if (val.compare(i, bd.length(), bd) == 0) {
+                arabic += to_string(d);
+                i += bd.length();
+                matched = true;
+                break;
             }
         }
-        arabic += val[i];
+        if (!matched) {
+            arabic += val[i];
+            i++;
+        }
     }
     try {
         return stod(arabic);

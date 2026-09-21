@@ -48,12 +48,13 @@ static bool isDigit(char c) {
     return c >= '0' && c <= '9';
 }
 
+static const std::string banglaDigits[10] = {"০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"};
+
 static bool isBengaliDigitAt(const std::string& source, int pos) {
-    if (pos + 2 < (int)source.length()) {
-        unsigned char b1 = source[pos];
-        unsigned char b2 = source[pos + 1];
-        unsigned char b3 = source[pos + 2];
-        return b1 == 0xE0 && b2 == 0xA7 && b3 >= 0xA6 && b3 <= 0xAF;
+    for (int d = 0; d < 10; d++) {
+        if (source.compare(pos, banglaDigits[d].length(), banglaDigits[d]) == 0) {
+            return true;
+        }
     }
     return false;
 }
