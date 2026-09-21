@@ -66,6 +66,14 @@ string TACGenerator::generateExpr(Expr* expr) {
         return v->name;
     }
 
+    if (UnaryExpr* u = dynamic_cast<UnaryExpr*>(expr)) {
+        string src = generateExpr(u->expr);
+        if (src.empty()) return "";
+        string dest = newTemp();
+        emit(new TACBinOp(dest, "0", u->op, src));
+        return dest;
+    }
+
     if (BinaryExpr* b = dynamic_cast<BinaryExpr*>(expr)) {
         string leftName = generateExpr(b->left);
         string rightName = generateExpr(b->right);

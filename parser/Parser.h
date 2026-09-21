@@ -33,6 +33,15 @@ struct BinaryExpr : Expr {
     }
 };
 
+struct UnaryExpr : Expr {
+    std::string op;
+    Expr* expr;
+    UnaryExpr(std::string op, Expr* expr) {
+        this->op = op;
+        this->expr = expr;
+    }
+};
+
 struct Stmt {
     virtual ~Stmt() = default;
 };
@@ -140,6 +149,8 @@ private:
 
     // ---- expressions ----
     Expr* parseExpr();
+    Expr* parseLogicalOr();
+    Expr* parseLogicalAnd();
     Expr* parseComparison();
     Expr* parseAdditive();
     Expr* parseTerm();

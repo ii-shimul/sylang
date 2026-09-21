@@ -79,7 +79,24 @@
                | ε
 
 
-<condition> ::= <expression> <comparison-op> <expression>
+<condition> ::= <expression>
+
+
+<expression> ::= <logical-or>
+
+
+<logical-or> ::= <logical-and>
+               | <logical-or> "অথবা" <logical-and>
+               | <logical-or> "othoba" <logical-and>
+
+
+<logical-and> ::= <comparison>
+                | <logical-and> "এবং" <comparison>
+                | <logical-and> "ebong" <comparison>
+
+
+<comparison> ::= <additive>
+               | <additive> <comparison-op> <additive>
 
 
 <comparison-op> ::= "=="
@@ -90,9 +107,9 @@
                   | ">="
 
 
-<expression> ::= <term>
-               | <expression> "+" <term>
-               | <expression> "-" <term>
+<additive> ::= <term>
+             | <additive> "+" <term>
+             | <additive> "-" <term>
 
 
 <term> ::= <factor>
@@ -102,6 +119,8 @@
 
 <factor> ::= <number>
            | <identifier>
+           | "-" <factor>
+           | "+" <factor>
            | "(" <expression> ")"
 
 

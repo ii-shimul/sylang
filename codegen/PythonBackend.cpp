@@ -46,6 +46,10 @@ string PythonBackend::generateExpr(Expr* expr) {
         return v->name;
     }
 
+    if (UnaryExpr* u = dynamic_cast<UnaryExpr*>(expr)) {
+        return "(" + u->op + generateExpr(u->expr) + ")";
+    }
+
     if (BinaryExpr* b = dynamic_cast<BinaryExpr*>(expr)) {
         string leftStr = generateExpr(b->left);
         string rightStr = generateExpr(b->right);

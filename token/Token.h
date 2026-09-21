@@ -22,6 +22,8 @@ enum class TokenKind {
     WHILE,      // জতক্ষণ
     FOR,        // জতবার / যতবার
     TYPE,       // পুরা / ভাঙ্গা
+    AND,        // এবং
+    OR,         // অথবা
     
     // Comparison operators
     EQEQ,       // ==

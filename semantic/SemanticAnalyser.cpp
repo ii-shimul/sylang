@@ -120,6 +120,10 @@ string SemanticAnalyser::checkExpression(Expr* expr) {
         return table.lookup(v->name);
     }
 
+    if (UnaryExpr* u = dynamic_cast<UnaryExpr*>(expr)) {
+        return checkExpression(u->expr);
+    }
+
     if (BinaryExpr* b = dynamic_cast<BinaryExpr*>(expr)) {
         string leftType = checkExpression(b->left);
         string rightType = checkExpression(b->right);
@@ -133,10 +137,19 @@ string SemanticAnalyser::checkExpression(Expr* expr) {
             }
         }
 
+        if (b->op == "and" || b->op == "or") {
+            return "পুরা";
+        }
+
         if (leftType != "" && rightType != "" && leftType != rightType) {
             errors.push_back("Error: Type mismatch in operation '" + b->op + "'. Cannot operate on '" + leftType + "' and '" + rightType + "'.");
             return "পুরা"; // default fallback
         }
+
+        if (b->op == "==" || b->op == "!=" || b->op == "<" || b->op == ">" || b->op == "<=" || b->op == ">=") {
+            return "পুরা";
+        }
+
         return leftType;
     }
 

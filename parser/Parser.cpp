@@ -230,7 +230,27 @@ vector<Stmt*> Parser::parseBlock() {
 }
 
 Expr* Parser::parseExpr() {
-    return parseComparison();
+    return parseLogicalOr();
+}
+
+Expr* Parser::parseLogicalOr() {
+    Expr* left = parseLogicalAnd();
+    while (check(TokenKind::OR)) {
+        advance(); // অথবা / othoba
+        Expr* right = parseLogicalAnd();
+        left = new BinaryExpr("or", left, right);
+    }
+    return left;
+}
+
+Expr* Parser::parseLogicalAnd() {
+    Expr* left = parseComparison();
+    while (check(TokenKind::AND)) {
+        advance(); // এবং / ebong
+        Expr* right = parseComparison();
+        left = new BinaryExpr("and", left, right);
+    }
+    return left;
 }
 
 Expr* Parser::parseComparison() {
@@ -266,6 +286,15 @@ Expr* Parser::parseTerm() {
 }
 
 Expr* Parser::parseFactor() {
+    if (match(TokenKind::MINUS)) {
+        if (check(TokenKind::NUMBER)) {
+            return new NumberExpr("-" + advance().lexeme);
+        }
+        return new UnaryExpr("-", parseFactor());
+    }
+    if (match(TokenKind::PLUS)) {
+        return parseFactor();
+    }
     if (check(TokenKind::NUMBER)) {
         return new NumberExpr(advance().lexeme);
     }
