@@ -42,14 +42,15 @@ void SemanticAnalyser::checkStatement(Stmt* stmt) {
     if (stmt == nullptr) return;
 
     if (VarDeclStmt* d = dynamic_cast<VarDeclStmt*>(stmt)) {
+        string normalizedType = (d->type == "pura" || d->type == "পুরা") ? "পুরা" : "ভাঙ্গা";
         if (table.isDefined(d->name)) {
             errors.push_back("Error: Variable '" + d->name + "' is already defined.");
         } else {
-            table.define(d->name, d->type);
+            table.define(d->name, normalizedType);
         }
         if (d->initValue != nullptr) {
             string exprType = checkExpression(d->initValue);
-            if (exprType != "" && exprType != d->type) {
+            if (exprType != "" && exprType != normalizedType) {
                 errors.push_back("Error: Type mismatch in declaration. Cannot initialize variable '" + d->name + "' of type '" + d->type + "' with expression of type '" + exprType + "'.");
             }
         }
