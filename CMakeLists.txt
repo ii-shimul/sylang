@@ -19,4 +19,6 @@ add_executable(sylang
     TAC/TACGenerator.cpp
     TAC/TACGenerator.h
     TAC/TACInstr.h
+    codegen/PythonBackend.cpp
+    codegen/PythonBackend.h
 )
