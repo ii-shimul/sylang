@@ -8,3 +8,5 @@
 পুরা ঘ = ১০;
 ভাঙ্গা ঙ = ২০.৫;
 ঘ = ঘ + ঙ; // type mismatch in operation
+পুরা চ = ১০ / ০; // division by zero
+
