@@ -1,6 +1,6 @@
-/ tac.h
-#ifndef TAC_H
-#define TAC_H
+// TACInstr.h
+#ifndef TAC_INSTR_H
+#define TAC_INSTR_H
 
 #include <string>
 using namespace std;
@@ -8,6 +8,7 @@ using namespace std;
 // Base struct for all Three-Address Code instructions
 struct TACInstr {
     virtual ~TACInstr() {}
+    virtual string toString() const = 0;
 };
 
 // t1 = left op right   (e.g. t1 = a + b)
@@ -23,6 +24,10 @@ struct TACBinOp : public TACInstr {
         op = o;
         right = r;
     }
+
+    string toString() const override {
+        return dest + " = " + left + " " + op + " " + right;
+    }
 };
 
 // dest = src   (constants and copies, e.g. x = 5 or x = t1)
@@ -34,6 +39,10 @@ struct TACCopy : public TACInstr {
         dest = d;
         src = s;
     }
+
+    string toString() const override {
+        return dest + " = " + src;
+    }
 };
 
 // print operand
@@ -42,6 +51,10 @@ struct TACPrint : public TACInstr {
 
     TACPrint(string o) {
         operand = o;
+    }
+
+    string toString() const override {
+        return "print " + operand;
     }
 };
 
@@ -52,6 +65,10 @@ struct TACLabel : public TACInstr {
     TACLabel(string n) {
         name = n;
     }
+
+    string toString() const override {
+        return name + ":";
+    }
 };
 
 // goto L1
@@ -60,6 +77,10 @@ struct TACJump : public TACInstr {
 
     TACJump(string t) {
         target = t;
+    }
+
+    string toString() const override {
+        return "goto " + target;
     }
 };
 
@@ -71,6 +92,10 @@ struct TACJumpIf : public TACInstr {
     TACJumpIf(string c, string t) {
         condition = c;
         target = t;
+    }
+
+    string toString() const override {
+        return "ifFalse " + condition + " goto " + target;
     }
 };
 

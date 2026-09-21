@@ -32,4 +32,5 @@ public:
 
     const std::vector<TACInstr*>& getInstructions() const;
     bool hasErrors() const;
+    void print(std::ostream& out) const;
 };

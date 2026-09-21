@@ -106,28 +106,35 @@ void TACGenerator::generateStmt(Stmt* stmt) {
         generateExpr(e->expr);
     }
     
-    //generate TAC for an if statement
+    // generate TAC for an if statement
     else if (IfStmt* i = dynamic_cast<IfStmt*>(stmt)) {
-        string L_else = newLabel();
-        string L_end = newLabel();
-
         string condition = generateExpr(i->condition);
+        if (i->elseBranch.empty()) {
+            string L_end = newLabel();
+            emit(new TACJumpIf(condition, L_end));
+            for (Stmt* s : i->thenBranch) {
+                generateStmt(s);
+            }
+            emit(new TACLabel(L_end));
+        } else {
+            string L_else = newLabel();
+            string L_end = newLabel();
 
-        emit(new TACJumpIf(condition, L_else));
+            emit(new TACJumpIf(condition, L_else));
 
-        for(Stmt* s : i->thenBranch){
-            generateStmt(s);
+            for (Stmt* s : i->thenBranch) {
+                generateStmt(s);
+            }
+
+            emit(new TACJump(L_end));
+            emit(new TACLabel(L_else));
+
+            for (Stmt* s : i->elseBranch) {
+                generateStmt(s);
+            }
+
+            emit(new TACLabel(L_end));
         }
-
-        emit(new TACJump(L_end));
-
-        emit(new TACLabel(L_else));
-
-        for(Stmt* s: i->elseBranch){
-            generateStmt(s);
-        }
-
-        emit(new TACLabel(L_end));
     }
 
     else if(WhileStmt* w = dynamic_cast<WhileStmt*>(stmt)){
@@ -165,4 +172,10 @@ const vector<TACInstr*>& TACGenerator::generate(const vector<Stmt*>& program) {
 
 const vector<TACInstr*>& TACGenerator::getInstructions() const {
     return instructions;
+}
+
+void TACGenerator::print(ostream& out) const {
+    for (size_t i = 0; i < instructions.size(); i++) {
+        out << "  " << instructions[i]->toString() << "\n";
+    }
 }

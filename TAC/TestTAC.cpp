@@ -1,7 +1,7 @@
-// test_tac.cpp
+// TestTAC.cpp
 #include <iostream>
 #include <vector>
-#include "tac.h"
+#include "TACInstr.h"
 using namespace std;
 
 int main() {

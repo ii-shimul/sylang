@@ -18,4 +18,5 @@ add_executable(sylang
     semantic/SemanticAnalyser.h
     TAC/TACGenerator.cpp
     TAC/TACGenerator.h
+    TAC/TACInstr.h
 )
