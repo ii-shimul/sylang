@@ -1,5 +1,9 @@
 #include "lexer/Lexer.h"
 #include "token/Token.h"
+// TEMPORARY TAC TEST START: remove this include with the block at the end.
+#include "parser/Parser.h"
+#include "TAC/TACGenerator.h"
+// TEMPORARY TAC TEST END
 #include <iostream>
 #include <fstream>
 #include <string>

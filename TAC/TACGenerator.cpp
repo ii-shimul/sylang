@@ -65,7 +65,7 @@ void TACGenerator::generateStmt(Stmt* stmt) {
         generateExpr(e->expr);
     }
     
-    //TAC for if statement
+    //generate TAC for an if statement
     else if (IfStmt* i = dynamic_cast<IfStmt*>(stmt)) {
         string L_else = newLabel();
         string L_end = newLabel();
@@ -85,6 +85,25 @@ void TACGenerator::generateStmt(Stmt* stmt) {
         for(Stmt* s: i->elseBranch){
             generateStmt(s);
         }
+
+        emit(new TACLabel(L_end));
+    }
+
+    else if(WhileStmt* w = dynamic_cast<WhileStmt*>(stmt)){
+        string L_start = newLabel();
+        string L_end = newLabel();
+
+        emit(new TACLabel(L_start));
+
+        string condition = generateExpr(w->condition);
+
+        emit(new TACJumpIf(condition, L_end));
+
+        for (Stmt* s : w->body){
+            generateStmt(s);
+        }
+
+        emit(new TACJump(L_start));
 
         emit(new TACLabel(L_end));
     }
