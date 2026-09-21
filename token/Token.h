@@ -20,6 +20,7 @@ enum class TokenKind {
     IF,         // জুদি
     ELSE,       // নাইলে
     WHILE,      // জতক্ষণ
+    FOR,        // জতবার / যতবার
     TYPE,       // পুরা / ভাঙ্গা
     
     // Comparison operators

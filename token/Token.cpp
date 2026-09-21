@@ -17,6 +17,7 @@ std::string tokenKindToString(TokenKind kind) {
         case TokenKind::IF: return "IF";
         case TokenKind::ELSE: return "ELSE";
         case TokenKind::WHILE: return "WHILE";
+        case TokenKind::FOR: return "FOR";
         case TokenKind::TYPE: return "TYPE";
         case TokenKind::PRINT: return "PRINT";
         case TokenKind::NEWLINE: return "NEWLINE";

@@ -88,6 +88,15 @@ void SemanticAnalyser::checkStatement(Stmt* stmt) {
         }
     }
 
+    else if (ForStmt* f = dynamic_cast<ForStmt*>(stmt)) {
+        if (f->init) checkStatement(f->init);
+        if (f->condition) checkExpression(f->condition);
+        if (f->update) checkStatement(f->update);
+        for (size_t k = 0; k < f->body.size(); k++) {
+            checkStatement(f->body[k]);
+        }
+    }
+
     else if (ExprStmt* e = dynamic_cast<ExprStmt*>(stmt)) {
         checkExpression(e->expr);
     }

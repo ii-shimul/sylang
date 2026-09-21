@@ -156,6 +156,29 @@ void TACGenerator::generateStmt(Stmt* stmt) {
         emit(new TACLabel(L_end));
     }
 
+    else if (ForStmt* f = dynamic_cast<ForStmt*>(stmt)) {
+        string L_start = newLabel();
+        string L_end = newLabel();
+
+        if (f->init) generateStmt(f->init);
+
+        emit(new TACLabel(L_start));
+
+        if (f->condition) {
+            string condition = generateExpr(f->condition);
+            emit(new TACJumpIf(condition, L_end));
+        }
+
+        for (Stmt* s : f->body) {
+            generateStmt(s);
+        }
+
+        if (f->update) generateStmt(f->update);
+
+        emit(new TACJump(L_start));
+        emit(new TACLabel(L_end));
+    }
+
     else {
         error("unsupported statement type");
     }

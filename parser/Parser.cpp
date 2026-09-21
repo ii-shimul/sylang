@@ -90,6 +90,9 @@ Stmt* Parser::parseStatement() {
     if (check(TokenKind::WHILE)) {
         return parseWhile();
     }
+    if (check(TokenKind::FOR)) {
+        return parseFor();
+    }
     if (check(TokenKind::IDENT) && peekAt(1).kind == TokenKind::EQUALS) {
         return parseAssignment();
     }
@@ -162,6 +165,45 @@ Stmt* Parser::parseWhile() {
     
     vector<Stmt*> body = parseBlock();
     return new WhileStmt(condition, body);
+}
+
+Stmt* Parser::parseFor() {
+    advance(); // for loop keyword
+    expect(TokenKind::LPAREN, "expected '(' after for loop keyword");
+
+    Stmt* init = nullptr;
+    if (!check(TokenKind::SEMICOLON)) {
+        if (check(TokenKind::TYPE)) {
+            init = parseDeclaration();
+        } else if (check(TokenKind::IDENT) && peekAt(1).kind == TokenKind::EQUALS) {
+            init = parseAssignment();
+        }
+    } else {
+        advance(); // consume ';'
+    }
+
+    Expr* condition = nullptr;
+    if (!check(TokenKind::SEMICOLON)) {
+        condition = parseExpr();
+    }
+    expect(TokenKind::SEMICOLON, "expected ';' after for condition");
+
+    Stmt* update = nullptr;
+    if (!check(TokenKind::RPAREN)) {
+        if (check(TokenKind::IDENT) && peekAt(1).kind == TokenKind::EQUALS) {
+            string name = advance().lexeme;
+            expect(TokenKind::EQUALS, "expected '=' in for update");
+            Expr* val = parseExpr();
+            update = new AssignStmt(name, val);
+        } else {
+            Expr* expr = parseExpr();
+            update = new ExprStmt(expr);
+        }
+    }
+    expect(TokenKind::RPAREN, "expected ')' after for clauses");
+
+    vector<Stmt*> body = parseBlock();
+    return new ForStmt(init, condition, update, body);
 }
 
 vector<Stmt*> Parser::parseBlock() {

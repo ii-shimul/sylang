@@ -10,23 +10,34 @@
               | <print-statement>
               | <if-statement>
               | <while-statement>
+              | <for-statement>
+
 
 
 <declaration> ::= <type> <identifier> ";"
                 | <type> <identifier> "=" <expression> ";"
 
 
-<type> ::= "pura"
-          | "bhanga"
+<type> ::= "পুরা" | "pura"
+          | "ভাঙ্গা" | "bhanga"
 
 
 <assignment> ::= <identifier> "=" <expression> ";"
 
 
-<print-statement> ::= "dekhaw" "(" <expression> ")" ";"
+<print-statement> ::= "দেখাও" "(" <expression> ")" ";"
+                    | "dekhaw" "(" <expression> ")" ";"
 
 
-<if-statement> ::= "zudi" "(" <condition> ")" "{"
+<if-statement> ::= "জুদি" "(" <condition> ")" "{"
+                       <statement-list>
+                   "}"
+                 | "জুদি" "(" <condition> ")" "{"
+                       <statement-list>
+                   "}" "নাইলে" "{"
+                       <statement-list>
+                   "}"
+                 | "zudi" "(" <condition> ")" "{"
                        <statement-list>
                    "}"
                  | "zudi" "(" <condition> ")" "{"
@@ -36,9 +47,36 @@
                    "}"
 
 
-<while-statement> ::= "zotokhon" "(" <condition> ")" "{"
+<while-statement> ::= "জতক্ষণ" "(" <condition> ")" "{"
                           <statement-list>
                       "}"
+                    | "zotokhon" "(" <condition> ")" "{"
+                          <statement-list>
+                      "}"
+
+
+<for-statement> ::= "জতবার" "(" <for-init> <condition> ";" <for-update> ")" "{"
+                        <statement-list>
+                    "}"
+                  | "যতবার" "(" <for-init> <condition> ";" <for-update> ")" "{"
+                        <statement-list>
+                    "}"
+                  | "zotobar" "(" <for-init> <condition> ";" <for-update> ")" "{"
+                        <statement-list>
+                    "}"
+                  | "for" "(" <for-init> <condition> ";" <for-update> ")" "{"
+                        <statement-list>
+                    "}"
+
+
+<for-init> ::= ";"
+             | <declaration>
+             | <assignment>
+
+
+<for-update> ::= <identifier> "=" <expression>
+               | <expression>
+               | ε
 
 
 <condition> ::= <expression> <comparison-op> <expression>
@@ -92,15 +130,15 @@
            | "H" | "I" | "J" | "K" | "L" | "M" | "N"
            | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
            | "V" | "W" | "X" | "Y" | "Z"
+           | <bengali-letter>
 
 
-<digit> ::= "0"
-          | "1"
-          | "2"
-          | "3"
-          | "4"
-          | "5"
-          | "6"
-          | "7"
-          | "8"
-          | "9"
+<bengali-letter> ::= "অ" | "আ" | "ই" | "ঈ" | "উ" | "ঊ" | "ঋ" | "এ" | "ঐ" | "ও" | "ঔ"
+                   | "ক" | "খ" | "গ" | "ঘ" | "ঙ" | "চ" | "ছ" | "জ" | "ঝ" | "ঞ"
+                   | "ট" | "ঠ" | "ড" | "ঢ" | "ণ" | "ত" | "থ" | "দ" | "ধ" | "ন"
+                   | "প" | "ফ" | "ব" | "ভ" | "ম" | "য" | "র" | "ল" | "শ" | "ষ"
+                   | "স" | "হ" | "ড়" | "ঢ়" | "য়"
+
+
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+          | "০" | "১" | "২" | "৩" | "৪" | "৫" | "৬" | "৭" | "৮" | "৯"

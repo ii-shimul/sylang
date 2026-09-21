@@ -84,6 +84,19 @@ struct WhileStmt : Stmt {
     }
 };
 
+struct ForStmt : Stmt {
+    Stmt* init;
+    Expr* condition;
+    Stmt* update;
+    std::vector<Stmt*> body;
+    ForStmt(Stmt* init, Expr* condition, Stmt* update, std::vector<Stmt*> body) {
+        this->init = init;
+        this->condition = condition;
+        this->update = update;
+        this->body = body;
+    }
+};
+
 struct ExprStmt : Stmt {
     Expr* expr;
     ExprStmt(Expr* expr) {
@@ -122,6 +135,7 @@ private:
     Stmt* parsePrint();
     Stmt* parseIf();
     Stmt* parseWhile();
+    Stmt* parseFor();
     std::vector<Stmt*> parseBlock();
 
     // ---- expressions ----

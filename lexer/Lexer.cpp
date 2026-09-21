@@ -207,6 +207,8 @@ std::vector<Token> Lexer::tokenize() {
                 tokens.push_back(Token(TokenKind::ELSE, identLex, line));
             } else if (identLex == "জতক্ষণ" || identLex == "zotokhon") {
                 tokens.push_back(Token(TokenKind::WHILE, identLex, line));
+            } else if (identLex == "জতবার" || identLex == "যতবার" || identLex == "zotobar" || identLex == "for") {
+                tokens.push_back(Token(TokenKind::FOR, identLex, line));
             } else if (identLex == "পুরা" || identLex == "pura" || identLex == "ভাঙ্গা" || identLex == "bhanga") {
                 tokens.push_back(Token(TokenKind::TYPE, identLex, line));
             } else {

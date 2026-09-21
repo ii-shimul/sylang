@@ -104,6 +104,23 @@ void PythonBackend::generateStmt(Stmt* stmt) {
         }
         indentLevel--;
     }
+    else if (ForStmt* f = dynamic_cast<ForStmt*>(stmt)) {
+        if (f->init) generateStmt(f->init);
+        string condStr = f->condition ? generateExpr(f->condition) : "True";
+        emit(getIndent() + "while " + condStr + ":");
+        indentLevel++;
+        if (f->body.empty() && !f->update) {
+            emit(getIndent() + "pass");
+        } else {
+            for (Stmt* s : f->body) {
+                generateStmt(s);
+            }
+            if (f->update) {
+                generateStmt(f->update);
+            }
+        }
+        indentLevel--;
+    }
     else if (ExprStmt* e = dynamic_cast<ExprStmt*>(stmt)) {
         emit(getIndent() + generateExpr(e->expr));
     }
