@@ -41,7 +41,6 @@ string TACGenerator::generateExpr(Expr* expr) {
         emit(new TACBinOp(dest, leftName, b->op, rightName));
         return dest;
     }
-
     return "";
 }
 
@@ -65,6 +64,31 @@ void TACGenerator::generateStmt(Stmt* stmt) {
     else if (ExprStmt* e = dynamic_cast<ExprStmt*>(stmt)) {
         generateExpr(e->expr);
     }
+    
+    //TAC for if statement
+    else if (IfStmt* i = dynamic_cast<IfStmt*>(stmt)) {
+        string L_else = newLabel();
+        string L_end = newLabel();
+
+        string condition = generateExpr(i->condition);
+
+        emit(new TACJumpIf(condition, L_else));
+
+        for(Stmt* s : i->thenBranch){
+            generateStmt(s);
+        }
+
+        emit(new TACJump(L_end));
+
+        emit(new TACLabel(L_else));
+
+        for(Stmt* s: i->elseBranch){
+            generateStmt(s);
+        }
+
+        emit(new TACLabel(L_end));
+    }
+
 }
 
 vector<TACInstr*> TACGenerator::generate(const vector<Stmt*>& program) {

@@ -1,6 +1,5 @@
 #include "lexer/Lexer.h"
-#include "parser/Parser.h"
-#include "semantic/SemanticAnalyser.h"
+#include "token/Token.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -25,28 +24,14 @@ int main() {
         source += line + "\n";
     }
 
+    cout << "Source code:\n" << source << endl;
+
     Lexer lexer(source);
     vector<Token> tokens = lexer.tokenize();
 
     cout << "\nTokens scanned:" << endl;
     for (size_t i = 0; i < tokens.size(); i++) {
         cout << "  " << tokens[i].toString() << endl;
-    }
-
-    cout << "\nParsing program..." << endl;
-    Parser parser(tokens);
-    vector<Stmt*> program = parser.parseProgram();
-
-    if (parser.hasError()) {
-        cout << "Parsing failed due to errors." << endl;
-    } else {
-        cout << "Parsing successful! Abstract Syntax Tree (AST):" << endl;
-        printAST(program);
-
-        cout << "\nRunning semantic analysis..." << endl;
-        SemanticAnalyser analyser;
-        analyser.checkProgram(program);
-        analyser.report();
     }
 
     return 0;
